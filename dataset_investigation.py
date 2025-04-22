@@ -142,6 +142,10 @@ plt.show()
 import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+
+from .model_trainer import ModelTrainer
+from sklearn.linear_model import LinearRegression, DecisionTreeRegressor, KNeighborsRegressor
 
 pca = PCA(n_components=0.95, random_state=1)
 ss = StandardScaler()
@@ -174,8 +178,15 @@ X = pca.fit_transform(ss.fit_transform(df.drop(columns=[label_column])))
 Для оценки степени переобученности вектор меток и исходных значений (Преобразованный dataset разобъем на три игтервала: обучающая, тестовая и контрольная выборки).
 А поле завершения обучения модели, проверим ее точность на контрольной выборке.
 """
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=1)
+X_train, X_valid, y_train, y_valid = train_test_split(X_train, y_train, test_size=0.1, random_state=1)
+prepared_X={'train': X_train, 'test': X_test, 'valid': X_valid}, prepared_y={'train': y_train, 'test': y_test, 'valid': y_valid}
 
-
+trainers = {
+    'LinearRegression': ModelTrainer(prepared_X, prepared_y, LinearRegression()),
+    'DecisionTreeRegressor': ModelTrainer(prepared_X, prepared_y, DecisionTreeRegressor()),
+    'KNeighborsRegressor': ModelTrainer(prepared_X, prepared_y, KNeighborsRegressor())
+}
 
 # Сохраним теперь скорректированные значения в отдельный файл.
 df.to_csv(os.path.join(work_dir, 'laptop_price_cleaned.csv'), index=False)
