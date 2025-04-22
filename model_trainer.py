@@ -26,7 +26,7 @@ class ModelTrainer:
 
     def fit(self) -> None:
         """
-        Обучение модели линейной регрессии.
+        Запуск обучения.
         """
         self.model.fit(self.X_train, self.y_train)
         
