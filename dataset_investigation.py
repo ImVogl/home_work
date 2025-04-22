@@ -222,4 +222,5 @@ plt.show()
 """
 
 # Сохраним теперь скорректированные значения в отдельный файл.
-df.to_csv(os.path.join(work_dir, 'laptop_price_cleaned.csv'), index=False)
+np.savetxt(os.path.join(work_dir, 'X.csv'), X, delimiter=',', fmt='%f')
+np.savetxt(os.path.join(work_dir, 'y.csv'), y, delimiter=',', fmt='%f')
