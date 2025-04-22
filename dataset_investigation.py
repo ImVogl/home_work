@@ -144,8 +144,10 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
-from .model_trainer import ModelTrainer
-from sklearn.linear_model import LinearRegression, DecisionTreeRegressor, KNeighborsRegressor
+from model_trainer import ModelTrainer
+from sklearn.linear_model import LinearRegression
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.tree import DecisionTreeRegressor
 
 pca = PCA(n_components=0.95, random_state=1)
 ss = StandardScaler()
@@ -180,13 +182,44 @@ X = pca.fit_transform(ss.fit_transform(df.drop(columns=[label_column])))
 """
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=1)
 X_train, X_valid, y_train, y_valid = train_test_split(X_train, y_train, test_size=0.1, random_state=1)
-prepared_X={'train': X_train, 'test': X_test, 'valid': X_valid}, prepared_y={'train': y_train, 'test': y_test, 'valid': y_valid}
+prepared_X={'train': X_train, 'test': X_test, 'valid': X_valid}
+prepared_y={'train': y_train, 'test': y_test, 'valid': y_valid}
 
 trainers = {
-    'LinearRegression': ModelTrainer(prepared_X, prepared_y, LinearRegression()),
-    'DecisionTreeRegressor': ModelTrainer(prepared_X, prepared_y, DecisionTreeRegressor()),
-    'KNeighborsRegressor': ModelTrainer(prepared_X, prepared_y, KNeighborsRegressor())
+    'LR': ModelTrainer(prepared_X, prepared_y, LinearRegression()),
+    'DT': ModelTrainer(prepared_X, prepared_y, DecisionTreeRegressor()),
+    'KNN': ModelTrainer(prepared_X, prepared_y, KNeighborsRegressor())
 }
+
+rmse = {}
+r2 = {}
+for name, trainer in trainers.items():
+    trainer.fit()
+    rmse[name] = trainer.rmse['valid']
+    r2[name] = trainer.r2_score['valid']
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 6))
+axes[0].set_xlabel('Models')
+axes[0].set_ylabel('RMSE')
+axes[0].grid()
+
+names, errors = zip(*rmse.items())
+axes[0].plot(names, errors, 'or')
+
+axes[1].set_xlabel('Models')
+axes[1].set_ylabel('R²')
+axes[1].grid()
+
+names, errors = zip(*r2.items())
+axes[1].plot(names, errors, 'or')
+plt.show()
+
+"""
+Согласно полученным графикам, модель n ближайших соседей показала наименьшее RMSE (421 против 476 у LR и 650 у DT)
+и наибольший R² (0.56 против 0.44 у LR и -0.05 у DT).
+В этой связи дальнейшее исследование будет проводиться на модели KNN.
+Сохраним скорректированные и преобразованные значения в отдельный файл.
+"""
 
 # Сохраним теперь скорректированные значения в отдельный файл.
 df.to_csv(os.path.join(work_dir, 'laptop_price_cleaned.csv'), index=False)
