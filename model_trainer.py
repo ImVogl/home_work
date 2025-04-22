@@ -1,5 +1,5 @@
 """
-В данном скрипте содержиться бизнес логика обучение модели с применением линейной регрессии.
+В данном скрипте содержиться бизнес логика обучения произвольной модели.
 """
 
 from sklearn.metrics import r2_score, root_mean_squared_error, mean_absolute_error, mean_absolute_percentage_error
