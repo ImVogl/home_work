@@ -2,7 +2,7 @@
 В данном скрипте содержиться бизнес логика обучение модели с применением линейной регрессии.
 """
 
-from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error, mean_absolute_percentage_error
+from sklearn.metrics import r2_score, root_mean_squared_error, mean_absolute_error, mean_absolute_percentage_error
 
 class ModelTrainer:
     """
@@ -19,7 +19,10 @@ class ModelTrainer:
         self.X_test, self.y_test = X['test'], y['test']
         self.X_valid, self.y_valid = X['valid'], y['valid']
         self.model = model
-        self.r2_score = self.mse = self.rmse = self.mape = { 'test': None, 'valid': None}
+        self.r2_score = { 'test': None, 'valid': None}
+        self.mse = { 'test': None, 'valid': None}
+        self.rmse = { 'test': None, 'valid': None}
+        self.mape = { 'test': None, 'valid': None}
 
     def fit(self) -> None:
         """
@@ -29,12 +32,12 @@ class ModelTrainer:
         
         y_pred = self.model.predict(self.X_test)
         self.mse['test'] = mean_absolute_error(self.y_test, y_pred)
-        self.rmse['test'] = mean_squared_error(self.y_test, y_pred)
+        self.rmse['test'] = root_mean_squared_error(self.y_test, y_pred)
         self.mape['test'] = mean_absolute_percentage_error(self.y_test, y_pred)
         self.r2_score['test'] = r2_score(self.y_test, y_pred)
 
         y_pred = self.model.predict(self.X_valid)
         self.mse['valid'] = mean_absolute_error(self.y_valid, y_pred)
-        self.rmse['valid'] = mean_squared_error(self.y_valid, y_pred)
+        self.rmse['valid'] = root_mean_squared_error(self.y_valid, y_pred)
         self.mape['valid'] = mean_absolute_percentage_error(self.y_valid, y_pred)
         self.r2_score['valid'] = r2_score(self.y_valid, y_pred)
